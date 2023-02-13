@@ -30,6 +30,10 @@ export const SetupEnvironment = async () => {
   );
   await testTokenContract.deployed();
 
+  console.log(`BUSD address: ${busdContract.address}`);
+  console.log(`testToken address: ${testTokenContract.address}`);
+  console.log(`uniswapv2 address: 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D`);
+
   const tokenAddress = await testTokenContract.balanceOf(
     testTokenDeployer.address
   );
@@ -41,11 +45,11 @@ export const SetupEnvironment = async () => {
     "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
   );
 
-  console.log(
-    await (
-      await ethers.provider.getBlock(await ethers.provider.getBlockNumber())
-    ).timestamp
-  );
+  // console.log(
+  //   await (
+  //     await ethers.provider.getBlock(await ethers.provider.getBlockNumber())
+  //   ).timestamp
+  // );
   /* approve 1e8 busd and 1e8 test token spend on uniswap router */
   await busdContract
     .connect(testTokenDeployer)

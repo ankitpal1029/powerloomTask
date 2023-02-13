@@ -29,15 +29,18 @@ contract Sniper {
         uniswapRouterAddress = _uniswapRouterAddress;
         BUSDAddress = _BUSDAddress;
         TTAddress = _TTAddress;
-        // burnerWalletWhitelist[msg.sender] = true;
+        maxTransactionAmount = Test(_TTAddress).maxTransactionAmount();
+        maxWallet = Test(_TTAddress).maxWallet();
+        enableBlock = Test(_TTAddress).enableBlock();
+        penaltyBlocks = Test(_TTAddress).penaltyBlocks();
     }
 
-    function setAnyChanges() external onlyOwner {
-        maxTransactionAmount = Test(TTAddress).maxTransactionAmount();
-        maxWallet = Test(TTAddress).maxWallet();
-        enableBlock = Test(TTAddress).enableBlock();
-        penaltyBlocks = Test(TTAddress).penaltyBlocks();
-    }
+    // function setAnyChanges() external onlyOwner {
+    //     maxTransactionAmount = Test(TTAddress).maxTransactionAmount();
+    //     maxWallet = Test(TTAddress).maxWallet();
+    //     enableBlock = Test(TTAddress).enableBlock();
+    //     penaltyBlocks = Test(TTAddress).penaltyBlocks();
+    // }
 
     modifier onlyBurnerWallets() {
         require(burnerWalletWhiteMap[msg.sender]);
@@ -87,19 +90,19 @@ contract Sniper {
         IERC20(BUSDAddress).approve(uniswapRouterAddress, _amountFromToken);
         // address[] memory _path = [_fromToken, _toToken];
         address[] memory path;
-        path = new address[](3);
+        path = new address[](2);
         path[0] = BUSDAddress;
         path[1] = TTAddress;
 
         // check if transaction limit is above amount being transfered amount
         // check if wallet to which amount is being transferred has less than maxWallet
         require(
-            Test(TTAddress).balanceOf(msg.sender) + _amountFromToken <
+            Test(TTAddress).balanceOf(msg.sender) + _amountFromToken <=
                 Test(TTAddress).maxWallet(),
             "wallet that TT token is being sent will cross maxWallet limit"
         );
         require(
-            _amountFromToken < Test(TTAddress).maxTransactionAmount(),
+            _amountFromToken <= Test(TTAddress).maxTransactionAmount(),
             "transaction amount too high, will get you blacklisted"
         );
         IUniswapV2Router02(uniswapRouterAddress).swapExactTokensForTokens(

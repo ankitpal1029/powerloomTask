@@ -2,6 +2,7 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { SetupEnvironment } from "./fixtures/setupEnvironmentFixture";
+import { SetupEnvironmentSmarter } from "./fixtures/setupEnvironmentSmarterFixture";
 
 describe("Test Attack", async () => {
   describe("Attack", async () => {
@@ -36,6 +37,38 @@ describe("Test Attack", async () => {
             ).timestamp) + 1800
           )
       ).to.be.revertedWith("UniswapV2: TRANSFER_FAILED");
+    });
+
+    it("Smart contract should prevent user A from calling swap function before penaltyDuration", async () => {
+      const {
+        userA,
+        sniperContract,
+        burnerWallet1,
+        burnerWallet2,
+        burnerWallet3,
+        uniswapDeployer,
+        busdDeployer,
+        busdContract,
+        testTokenDeployer,
+        testTokenContract,
+        uniswapRouter02,
+      } = await loadFixture(SetupEnvironmentSmarter);
+      const path = [busdContract.address, testTokenContract.address];
+      const amount = await uniswapRouter02.getAmountsOut(
+        ethers.utils.parseEther("35000"),
+        path
+      );
+      const burnerWalletArray = [burnerWallet1, burnerWallet2, burnerWallet3];
+      for (let i = 0; i < burnerWalletArray.length; i++) {
+        const balance = await testTokenContract.balanceOf(
+          burnerWalletArray[i].address
+        );
+        console.log(
+          `address: ${
+            burnerWalletArray[i].address
+          } has ${balance.toString()} TT`
+        );
+      }
     });
   });
 });

@@ -1,3 +1,7 @@
+## Architecture
+
+![architecture](./assets/architecture.png)
+
 ## Problem Statement
 
 As a DeFi trader, you've learned about a highly-anticipated token launch that is set to take place on a low gas EVM-compatible chain such as Binance Smart Chain or Polygon. The token will be available for trading on a fork of Uniswap V2. You have obtained the verified contract code before the launch.

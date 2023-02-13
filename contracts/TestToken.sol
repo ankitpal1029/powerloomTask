@@ -488,7 +488,7 @@ abstract contract Context {
     }
 }
 
-pragma solidity >=0.7 .5;
+// pragma solidity >=0.7.5;
 
 contract Ownable is Context {
     address private _owner;
@@ -725,7 +725,8 @@ contract Test is ERC20, Ownable {
 
     bool public tradingActive = false;
     uint256 public enableBlock = 0;
-    address public BUSD = address(0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56);
+    // address public BUSD = address(0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56); // modify ANKIT
+    address public immutable BUSD;
 
     uint256 public penaltyBlocks = 3;
 
@@ -754,13 +755,17 @@ contract Test is ERC20, Ownable {
 
     event SetAutomatedMarketMakerPair(address indexed pair, bool indexed value);
 
-    constructor() ERC20("Test", "Test", 18) {
+    constructor(
+        address _busdAddress,
+        address _uniswapV2RouterAddress
+    ) ERC20("Test", "Test", 18) {
+        BUSD = _busdAddress;
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(
-            0x10ED43C718714eb63d5aA57B78B54704E256024E
+            _uniswapV2RouterAddress
         );
         uniswapV2Router = _uniswapV2Router;
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
-            .createPair(address(this), BUSD);
+            .createPair(address(this), _busdAddress);
         _setAutomatedMarketMakerPair(address(uniswapV2Pair), true);
 
         initialSupply = 100000000 * 1e18;

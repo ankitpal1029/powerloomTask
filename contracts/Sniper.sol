@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.5;
 
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router01.sol";
-// import "@openzeppelin/contracts/interfaces/IERC20.sol";
-import "./interfaces/IERC20.sol";
+// import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "./TestToken.sol";
+
+// import "./interfaces/IERC20.sol";
 
 contract Sniper {
     mapping(address => bool) burnerWalletWhiteMap;
@@ -42,9 +43,12 @@ contract Sniper {
 
     // swap tokens that user A sent to sniper contract
     function swapBUSDToTTUniswap(
-        uint256 _amountFromToken,
-        uint256 _amountOutMin
-    ) external onlyBurnerWallets {
+        uint256 _amountFromToken
+    )
+        external
+        // uint256 _amountOutMin
+        onlyBurnerWallets
+    {
         // a check that current block number > test token creation block + penalty blocks
         // what token from :
         // what token to: test token
@@ -56,7 +60,7 @@ contract Sniper {
         path[0] = BUSDAddress;
         path[1] = TTAddress;
 
-        IUniswapV2Router01(uniswapRouterAddress).swapExactTokensForTokens(
+        IUniswapV2Router02(uniswapRouterAddress).swapExactTokensForTokens(
             _amountFromToken,
             1,
             path,

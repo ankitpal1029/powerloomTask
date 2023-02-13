@@ -39,17 +39,12 @@ describe("Test Attack", async () => {
       ).to.be.revertedWith("UniswapV2: TRANSFER_FAILED");
     });
 
-    it("Smart contract should prevent user A from calling swap function before penaltyDuration", async () => {
+    it("let EOAs swap BUSD on the contract for TT tokens", async () => {
       const {
-        userA,
-        sniperContract,
         burnerWallet1,
         burnerWallet2,
         burnerWallet3,
-        uniswapDeployer,
-        busdDeployer,
         busdContract,
-        testTokenDeployer,
         testTokenContract,
         uniswapRouter02,
       } = await loadFixture(SetupEnvironmentSmarter);
@@ -69,6 +64,70 @@ describe("Test Attack", async () => {
           } has ${balance.toString()} TT`
         );
       }
+    });
+
+    it("Smart contract should prevent user A from calling swap function before penaltyDuration", async () => {
+      const {
+        userA,
+        sniperContract,
+        burnerWallet1,
+        burnerWallet2,
+        burnerWallet3,
+        uniswapDeployer,
+        busdDeployer,
+        busdContract,
+        testTokenDeployer,
+        testTokenContract,
+        uniswapRouter02,
+      } = await loadFixture(SetupEnvironmentSmarter);
+      const currentBlock = await ethers.provider.getBlockNumber();
+      const timeofTTDeploy = await testTokenContract.enableBlock();
+      const penalty = await testTokenContract.penaltyBlocks();
+      console.log(currentBlock, timeofTTDeploy.add(penalty).toString());
+    });
+
+    it("Dump tokens after launch is over i.e limitsInEffect is false", async () => {
+      const {
+        userA,
+        sniperContract,
+        burnerWallet1,
+        burnerWallet2,
+        burnerWallet3,
+        uniswapDeployer,
+        busdDeployer,
+        busdContract,
+        testTokenDeployer,
+        testTokenContract,
+        uniswapRouter02,
+      } = await loadFixture(SetupEnvironmentSmarter);
+
+      /* TT owner removes limits after token sale is concluded */
+      await testTokenContract.connect(testTokenDeployer).removeLimits();
+
+      /* this is where we start dumping the tokens */
+      const burnerWalletArray = [burnerWallet1, burnerWallet2, burnerWallet3];
+      await sniperContract.connect(userA).dumpTTTokensUniswap();
+      //   for (let i = 0; i < burnerWalletArray.length; i++) {
+      //     await sniperContract
+      //       .connect(burnerWalletArray[i])
+      //       .dumpTTTokensUniswap();
+      //   }
+
+      for (let i = 0; i < burnerWalletArray.length; i++) {
+        const burnerWalletIBalance = await testTokenContract
+          .connect(burnerWalletArray[i])
+          .balanceOf(burnerWalletArray[i].address);
+        console.log(
+          `> ${
+            burnerWalletArray[i].address
+          } TT balance: ${burnerWalletIBalance.toString()}`
+        );
+      }
+
+      const sniperBUSDBalance = await busdContract.balanceOf(
+        sniperContract.address
+      );
+      console.log(`> sniper BUSD balance: ${sniperBUSDBalance.toString()}`);
     });
   });
 });

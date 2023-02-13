@@ -1,5 +1,6 @@
 import { ethers } from "hardhat";
 import { Worker } from "worker_threads";
+import { ExecuteSwaps } from "../helper/executeSwaps";
 import { executeTransaction } from "../helper/executeTransaction";
 
 export const SetupEnvironmentSmarter = async () => {
@@ -94,32 +95,17 @@ export const SetupEnvironmentSmarter = async () => {
 
   const burnerWalletArray = [burnerWallet1, burnerWallet2, burnerWallet3];
 
+  /* updating penalty blocks */
+  await testTokenContract.connect(testTokenDeployer).updatePenaltyBlocks(10);
+  /* launching the token */
   await testTokenContract.connect(testTokenDeployer).init();
-  for (let i = 0; i < burnerWalletArray.length; i++) {
-    await sniperContract
-      .connect(userA)
-      .addBurnerWallet(burnerWalletArray[i].address);
-  }
 
-  for (let i = 0; i < burnerWalletArray.length; i++) {
-    await sniperContract
-      .connect(burnerWalletArray[i])
-      .swapBUSDToTTUniswap(ethers.utils.parseEther("350000"));
-  }
-  //   for (let i = 0; i < burnerWalletArray.length; i++) {
-  //     const worker = new Worker("../helper/executeTransaction.js", {
-  //       workerData: {
-  //         value: i + 1,
-  //         path: "../helper/executeTransaction.ts",
-  //       },
-  //     });
-  //     worker.on("message", (result) => {
-  //       console.log("yo", result);
-  //     });
-  //   }
-  //   await sniperContract
-  //     .connect(burnerWallet1)
-  //     .swapBUSDToTTUniswap(ethers.utils.parseEther("350000"));
+  await ExecuteSwaps(
+    sniperContract,
+    burnerWalletArray,
+    userA,
+    testTokenContract
+  );
 
   return {
     userA,

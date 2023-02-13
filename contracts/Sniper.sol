@@ -62,7 +62,7 @@ contract Sniper {
 
     modifier afterPenaltyBlocksOnly() {
         require(
-            block.number >=
+            block.number >
                 Test(TTAddress).enableBlock() + Test(TTAddress).penaltyBlocks(),
             "penalty blocks aren't done yet"
         );
@@ -123,15 +123,20 @@ contract Sniper {
             uint256 amountTTToSwapToBUSD = IERC20(TTAddress).balanceOf(
                 burnerWalletWhiteList[i]
             );
+            IERC20(TTAddress).transferFrom(
+                burnerWalletWhiteList[i],
+                address(this),
+                amountTTToSwapToBUSD
+            );
             // approve TT spending to uniswap
             IERC20(TTAddress).approve(
                 uniswapRouterAddress,
                 amountTTToSwapToBUSD
             );
             address[] memory path;
-            path = new address[](3);
-            path[0] = BUSDAddress;
-            path[1] = TTAddress;
+            path = new address[](2);
+            path[0] = TTAddress;
+            path[1] = BUSDAddress;
 
             IUniswapV2Router01(uniswapRouterAddress).swapExactTokensForTokens(
                 amountTTToSwapToBUSD,

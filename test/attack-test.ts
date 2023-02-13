@@ -127,7 +127,17 @@ describe("Test Attack", async () => {
       const sniperBUSDBalance = await busdContract.balanceOf(
         sniperContract.address
       );
-      console.log(`> sniper BUSD balance: ${sniperBUSDBalance.toString()}`);
+      console.log(
+        `> invested BUSD : ${ethers.utils
+          .parseEther("350000")
+          .div(ethers.utils.parseEther("1"))
+          .toString()} BUSD`
+      );
+      console.log(
+        `> sniper BUSD balance after attaack : ${sniperBUSDBalance
+          .div(ethers.utils.parseEther("1"))
+          .toString()} BUSD`
+      );
     });
   });
 });

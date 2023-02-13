@@ -1,5 +1,7 @@
 import { ethers } from "hardhat";
 
+const uniswapRouter02Address = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
+
 const main = async () => {
   const [
     userA,
@@ -26,21 +28,19 @@ const main = async () => {
   );
   const testTokenContract = await TestTokenFactory.deploy(
     busdContract.address,
-    "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    uniswapRouter02Address
   );
   await testTokenContract.deployed();
 
-  //   const unipairAddress = await testTokenContract.uniswapV2Pair();
-  //   console.log(unipairAddress);
   const tokenAddress = await testTokenContract.balanceOf(
     testTokenDeployer.address
   );
   console.log(`balance of owner : ${tokenAddress.toString()}`);
-  /* provide liquidity via uniswap router */
 
+  /* provide liquidity via uniswap router */
   const uniswapRouter02 = await ethers.getContractAt(
     "IUniswapV2Router02",
-    "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+    uniswapRouter02Address
   );
 
   console.log(
@@ -74,24 +74,6 @@ const main = async () => {
     );
 
   /* start the launch */
-
-  // function removeLimits() external onlyOwner returns (bool) {
-  // function updatePenaltyBlocks(uint256 _numBlocks) external onlyOwner {
-  // function disableTransferDelay() external onlyOwner returns (bool) {
-  // function init() external onlyOwner {
-  // maxTransactionAmount  = 0.0035 * 1e8 * 1e18
-  // maxWallet = 0.01 * 1e8 * 1e18
-
-  //   const busdContract = await BUSDFactory.deploy();
-  //   await busdContract.deployed();
-
-  // use fork uniswap
-  //   const UniswapFactoryFactory  =  await ethers.getContractFactory("")
-  //   const uniswapRouter = await ethers.getContractAt(
-  //     "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
-  //   );
-
-  //   const SniperFactory = await ethers.getContractFactory("")
 };
 
 main().catch((err) => {

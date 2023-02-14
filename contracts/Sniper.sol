@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.5;
 
-// import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "./TestToken.sol";
-
-// import "./interfaces/IERC20.sol";
 
 contract Sniper {
     mapping(address => bool) burnerWalletWhiteMap;
@@ -20,6 +17,10 @@ contract Sniper {
     uint256 enableBlock;
     uint256 public penaltyBlocks = 3;
 
+    // @notice Contract constructor
+    // @param _uniswapRouterAddress The contract address of UniswapV2Router02
+    // @param _BUSDAddrss The contract address of ERC20 token Binance USD
+    // @param _TTAddress The contract address of ERC20 token Test
     constructor(
         address _uniswapRouterAddress,
         address _BUSDAddress,
@@ -34,13 +35,6 @@ contract Sniper {
         enableBlock = Test(_TTAddress).enableBlock();
         penaltyBlocks = Test(_TTAddress).penaltyBlocks();
     }
-
-    // function setAnyChanges() external onlyOwner {
-    //     maxTransactionAmount = Test(TTAddress).maxTransactionAmount();
-    //     maxWallet = Test(TTAddress).maxWallet();
-    //     enableBlock = Test(TTAddress).enableBlock();
-    //     penaltyBlocks = Test(TTAddress).penaltyBlocks();
-    // }
 
     modifier onlyBurnerWallets() {
         require(burnerWalletWhiteMap[msg.sender]);
@@ -69,26 +63,19 @@ contract Sniper {
         _;
     }
 
+    // @notice Helps owner add whitelisted burner wallets which will be later used for dumping tokens
+    // @param burnerWalletAddress Address of burner wallet that needs to be whitelisted
     function addBurnerWallet(address burnerWalletAddress) external onlyOwner {
         burnerWalletWhiteMap[burnerWalletAddress] = true;
         burnerWalletWhiteList.push(burnerWalletAddress);
     }
 
-    // swap tokens that user A sent to sniper contract
+    // @notice Swaps BUSD in the contract for Test Token after penaltyBlocks expire, can be called only by whitelisted Burner wallets
+    // @param _amountFromToken amount of BUSD to trade for TT
     function swapBUSDToTTUniswap(
         uint256 _amountFromToken
-    )
-        external
-        // uint256 _amountOutMin
-        onlyBurnerWallets
-        afterPenaltyBlocksOnly
-    {
-        // a check that current block number > test token creation block + penalty blocks
-        // what token from :
-        // what token to: test token
-        // IERC20(_fromToken).approve(uniswapRouterAddress, _amountFromToken);
+    ) external onlyBurnerWallets afterPenaltyBlocksOnly {
         IERC20(BUSDAddress).approve(uniswapRouterAddress, _amountFromToken);
-        // address[] memory _path = [_fromToken, _toToken];
         address[] memory path;
         path = new address[](2);
         path[0] = BUSDAddress;
@@ -114,8 +101,8 @@ contract Sniper {
         );
     }
 
-    // after token launch is over - now all the limitations are not present
     // User A can trigger this to dump all TT tokens for BUSD - all the burner wallets can approve spending by this contract in advance
+    // @notice Used to dump Test Token into Uniswap LP after limits are withdrawn
     function dumpTTTokensUniswap() external onlyOwner afterLimitsDownOnly {
         for (uint256 i = 0; i < burnerWalletWhiteList.length; i++) {
             // transferFrom all tokens from burnerWallets

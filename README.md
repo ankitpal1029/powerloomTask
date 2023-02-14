@@ -2,6 +2,25 @@
 
 ![architecture](./assets/architecture.png)
 
+## Solution
+
+You can use the tests by running
+
+```
+yarn hardhat test
+```
+
+The standalone script for running the attack is in `./scripts/Attack.ts`
+
+The sniper contract is `./contracts/Sniper.sol`
+
+### Sequence of events
+
+- UserA will deposit any BUSD that they have into `Sniper.sol`
+- UserA will create several burner wallets which will trigger swap function via `Sniper.sol` spending the BUSD on the contract
+- After receiving the Test Token, the burner wallets should approve the entire amount for spending via `Sniper.sol`
+- Upon the limits being withdrawn post the launch, UserA can trigger a dump which will dump all of the burner wallets Test tokens.
+
 ## Problem Statement
 
 As a DeFi trader, you've learned about a highly-anticipated token launch that is set to take place on a low gas EVM-compatible chain such as Binance Smart Chain or Polygon. The token will be available for trading on a fork of Uniswap V2. You have obtained the verified contract code before the launch.

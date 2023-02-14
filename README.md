@@ -21,6 +21,11 @@ The sniper contract is `./contracts/Sniper.sol`
 - After receiving the Test Token, the burner wallets should approve the entire amount for spending via `Sniper.sol`
 - Upon the limits being withdrawn post the launch, UserA can trigger a dump which will dump all of the burner wallets Test tokens.
 
+### Improvements
+
+- Implementing the BUSD token swap to Test Token concurrently that way we can fit as many as possible on a single block.
+- Right now I have implemented the dump function using an array of whitelisted burner wallets but this could lead to gas running out.
+
 ## Problem Statement
 
 As a DeFi trader, you've learned about a highly-anticipated token launch that is set to take place on a low gas EVM-compatible chain such as Binance Smart Chain or Polygon. The token will be available for trading on a fork of Uniswap V2. You have obtained the verified contract code before the launch.
